@@ -57,7 +57,8 @@
       texto: () => osc([2,4,3,4].fast(.2),.5,12).pixelate(40,2,8).color(5,3,.4),
       contrario: () => solid(1,2,5).invert([0,1]),
       territorio: () => osc(1,1,1).diff(shape()).scale(0.5).add(shape(7),[0,0.25,0.5,0.75,1].fast(10)),
-      transformacion: () => osc(1,5,1).saturate( ({time}) => Math.sin(time) * 10 ),    
+      transformacion: () => osc(1,5,1).saturate( ({time}) => Math.sin(time) * 10 ),
+      perdida: () => osc(9,-0.1,0.1).modulateKaleid(osc(5,0.5,0),30).scale(0.7,0.3).modulate(noise(5,0.1)).mult(solid(8,6,8.3)),
     };
 
     const input = document.getElementById("input");
