@@ -55,6 +55,7 @@
       delirio: () => osc(10, 0.5, 2).colorama(-0.9).modulate(o0, 0.5),
       amor: () => voronoi(2, 0.5, 2).colorama(-0.9).modulate(osc(3, 0.5, 1), 0.5),
       remix: () => noise(3, 0.4).modulate(osc(2, 0.5, 2), 0.9).diff(noise(2, 0.5, 2)),
+      contrario: () => solid(1,2,5).invert([0,1])
     };
 
     const input = document.getElementById("input");
