@@ -63,6 +63,7 @@
       global: () => osc(2,1,.009).pixelate(10,10).kaleid(8),
       perdida: () => osc(9,-0.1,0.1).modulateKaleid(osc(5,0.5,0),30).scale(0.7,0.3).modulate(noise(5,0.1)).mult(solid(8,6,8.3)),
       expresion: () => shape(99).scroll(() => -mouse.x / width,() => -mouse.y / height),
+      babel: () => src(o0).modulateHue(src(o0).scale(1.01),1).layer(osc(4,0.5,2).mask(shape(20,0.5,0.001)))
     };
 
     const input = document.getElementById("input");
