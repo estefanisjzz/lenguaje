@@ -49,7 +49,7 @@
     const hydra = new Hydra({ detectAudio: false });
 
     const palabras = {
-      piedra: () => osc(2,1,.009).pixelate(10,10).kaleid(8),
+      traduccion=voronoi(.5,.2,.9).modulate(noise(.5),0.5.color(9,5,6).lumma(0.5)
       intraducibilidad: () => noise(5).color(4,5,7).pixelate(10,10),
       global: () => osc(2,1,.009).pixelate(10,10).kaleid(8),
       delirio: () => osc(10, 0.5, 2).colorama(-0.9).modulate(o0, 0.5),
@@ -80,7 +80,7 @@
       if (entradas.length > 0) {
         // Componer blend entre todas
         let comp = palabras[entradas[0]]();
-        for (let i = 1; i < entradas.length; i++) {
+  for (let i = 1; i < entradas.length; i++) {
           comp = comp.diff(palabras[entradas[i]](), 0.5);
         }
         comp.out();
