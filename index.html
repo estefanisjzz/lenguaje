@@ -57,7 +57,7 @@
       remix: () => noise(3, 0.4).modulate(osc(2, 0.5, 2), 0.9).diff(noise(2, 0.5, 2)),
       contrario: () => solid(1,2,5).invert([0,1])
     territorio: () => osc(1,1,1).diff(shape()).scale(0.5).add(shape(7),[0,0.25,0.5,0.75,1].fast(10))
-    };
+    transformacion: () => osc(1,5,1).saturate( ({time}) => Math.sin(time) * 10 )    };
 
     const input = document.getElementById("input");
 
