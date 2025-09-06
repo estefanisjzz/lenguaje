@@ -12,30 +12,30 @@
       height: 100%;
       background: black;
     }
-<div class="container">
-        <div class="xx xxxxxxxx xx xx xxxxxxxxxxx xx xxxxxxxxxxxxxx.">Background Text</div>
-        <p>This is the foreground content.</p>
-        <p>More foreground content here.</p>
-    </div>
-
-    .container {
-        position: relative; /* Essential for positioning child elements */
+.container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
     }
 
-    .background-text {
-        position: absolute; /* Position relative to the container */
+   .background-text {
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        text-align: center; /* Center the background text */
-        font-size: 10em; /* Adjust font size as needed */
-        color: rgba(0, 0, 0, 0.19); /* Semi-transparent black for background effect */
-        z-index: -1; /* Place behind other content */
-        pointer-events: none; /* Prevent interaction with background text */
-        display: flex; /* For vertical centering */
-        align-items: center; /* For vertical centering */
-        justify-content: center; /* For horizontal centering */
+        text-align: center;
+        font-size: 8em;
+        color: rgba(255, 255, 255, 0.1);
+        z-index: 1;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'console', sans-serif;
+        font-weight: bold;
+        letter-spacing: 0.1em;
     }
     
     canvas {
@@ -68,6 +68,10 @@
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="background-text">xx xxxxxxxx xx xx xxxxxxxxxxx xx xxxxxxxxxxxxxx.</div>
+  </div>
+  
   <textarea id="input" placeholder="El lenguaje es..."></textarea>
 
   <script>
@@ -123,5 +127,6 @@
   </script>
 </body>
 </html>
+
 
 
