@@ -75,17 +75,17 @@
   
   <textarea id="input" placeholder="El lenguaje es..."></textarea>
 
- <script>
+<script>
   const hydra = new Hydra({ detectAudio: false });
 
   const palabras = {
-    acces: () => osc(20, 0.03, 1.7).kaleid().mult(osc(0, 0.01, 0)).blend(o0, 0.9).modulateScale(osc(10, 0), -0.03),
+    acces: () => osc(20, 0.03, 1.7).kaleid().mult(osc(0, 0.01, 0)).modulateScale(osc(10, 0), -0.03),
     acuer: () => shape(99).kaleid(4).scale(0.3).scroll(() => -mouse.x / width, () => -mouse.y / height),
     colect: () => shape(4, 0.9).mult(osc(4, 0.25, 1)).modulateRepeatX(osc(10), 5.0, ({time}) => Math.sin(time) * 5).scale(1, 0.5, 0.05),
     comun: () => noise(3, 0.1).thresh(0.5, 0.04).color(() => Math.sin(time*0.5), () => Math.cos(time*0.3), () => Math.sin(time*0.7)),
-    cultu: () => osc(20, 0.03, 1.7).rotate(1.58).blend(o0, 0.94).modulateScale(osc(10, 0), -0.03).scale(0.8, () => (1.05 + 0.1 * Math.sin(0.05*time))),
+    cultu: () => osc(20, 0.03, 1.7).rotate(1.58).modulateScale(osc(10, 0), -0.03).scale(0.8, () => (1.05 + 0.1 * Math.sin(0.05*time))),
     contra: () => solid(1, 2, 5).invert([0,1]),
-    dialog: () => osc(12,0.01,0.001).mult(osc(1,0.1).modulate(osc(2).rotate(4,1),20)).color(0,2.4,5).saturate(0.2).luma(1,0.1).scale(0.7, ()=> 0.7 + a.fft[3]).diff(o0),
+    dialog: () => osc(12,0.01,0.001).mult(osc(1,0.1).modulate(osc(2).rotate(4,1),20)).color(0,2.4,5).saturate(0.2).luma(1,0.1).scale(0.7),
     escri: () => voronoi(25,2,10).color(3,3,8).brightness(1.15),
     expre: () => shape(99).scroll(() => -mouse.x / width, () => -mouse.y / height),
     global: () => osc(2,1,.009).pixelate(10,10).kaleid(8),
@@ -98,7 +98,11 @@
     text: () => osc(50).layer(osc(50).rotate(1).luma()),
     trad: () => voronoi(.5,.2,.9).modulate(noise(.5),0.5).color(9,5,6).luma(0.5),
     trans: () => osc(1,5,1).saturate(({time}) => Math.sin(time) * 10),
-    verb: () => shape(() => Math.floor(time * 0.3) % 7 + 3, 0.3, 0.01).color(() => Math.sin(time * 0.5) + 0.5, () => Math.cos(time * 0.7) + 0.5, () => Math.sin(time * 0.3) + 0.5).rotate(() => time * 0.1)
+    verb: () => shape(() => Math.floor(time * 0.3) % 7 + 3, 0.3, 0.01)
+              .color(() => Math.sin(time * 0.5) + 0.5,
+                     () => Math.cos(time * 0.7) + 0.5,
+                     () => Math.sin(time * 0.3) + 0.5)
+              .rotate(() => time * 0.1)
   };
 
   const input = document.getElementById("input");
@@ -106,39 +110,36 @@
   input.addEventListener("input", () => {
     const texto = input.value.toLowerCase().trim();
 
-    // 🧹 Si se borra el texto, limpia el canvas
+    // 🧹 Limpiar si se borra todo
     if (texto === "") {
       solid(0, 0, 0).out();
       return;
     }
 
-    // Si contiene comas: modulación encadenada
-    if (texto.includes(",")) {
-      const modWords = texto.split(",").map(w => w.trim()).filter(w => palabras[w]);
-      if (modWords.length >= 2) {
-        let base = palabras[modWords[0]]();
-        for (let i = 1; i < modWords.length; i++) {
-          base = base.add(palabras[modWords[i]](), 0.3);
-        }
-        base.out();
-        return;
-      }
+    const palabrasActivas = texto.split(/\s+/).map(w => w.trim()).filter(w => palabras[w]);
+
+    if (palabrasActivas.length === 0) {
+      return;
     }
 
-    // Si no hay comas: combinar todas las palabras como capas mezcladas
-    const entradas = texto.split(/\s+/).map(w => w.trim()).filter(w => palabras[w]);
-    if (entradas.length > 0) {
-      let comp = palabras[entradas[0]]();
-      for (let i = 1; i < entradas.length; i++) {
-        comp = comp.add(palabras[entradas[i]](), 0.4); // antes usabas diff(), esto mezcla en lugar de restar
-      }
-      comp.out();
+    // 🌀 Crear la primera capa en o1
+    let base = palabras[palabrasActivas[0]]().out(o1);
+
+    // 🧩 Ir combinando las demás sin borrar la anterior
+    for (let i = 1; i < palabrasActivas.length; i++) {
+      palabras[palabrasActivas[i]]()
+        .blend(src(o1), 0.5)   // mezcla visual
+        .out(o1);
     }
+
+    // 🎨 Finalmente mostrar o1 en pantalla
+    src(o1).blend(o0, 0.6).out(o0);
   });
 </script>
-  
+
 </body>
 </html>
+
 
 
 
