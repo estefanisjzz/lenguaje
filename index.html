@@ -82,23 +82,23 @@
       acces: () => osc(20, 0.03, 1.7).kaleid().mult(osc(0, 0.01, 0)).blend(o0, 0.9).modulateScale(osc(10, 0),-0.03)
       acuer: () => shape(99).kaleid(4).scale(0.3).scroll(() => -mouse.x / width,() => -mouse.y / height)
       colect: () => shape(4, 0.9).mult(osc(4, 0.25, 1)).modulateRepeatX(osc(10), 5.0, ({time}) => Math.sin(time) * 5).scale(1, 0.5, 0.05)
-    comun: () => noise(3,0.1).thresh(0.5,0.04).color(() => Math.sin(time*0.5), () => Math.cos(time*0.3), () => Math.sin(time*0.7))
-    cultu: () => osc(20, 0.03, 1.7).rotate(1.58).blend(o0, 0.94).modulateScale(osc(10, 0),-0.03).scale(0.8, () => (1.05 + 0.1 * Math.sin(0.05*time)))
-    contra: () => solid(1,2,5).invert([0,1])
-    dialog: () => osc(12,0.01,0.001).mult(osc(1,0.1).modulate(osc(2).rotate(4,1),20)).color(0,2.4,5).saturate(0.2).luma(1,0.1).scale(0.7, ()=> 0.7 + a.fft[3]).diff(o0)
-    escri: () => voronoi(25,2,10).color(3,3,8).brightness(1.15)
-    expre: () => shape(99).scroll(() => -mouse.x / width,() => -mouse.y / height)
-    global: () => osc(2,1,.009).pixelate(10,10).kaleid(8)
-    habla: () => osc(25,-0.3,0.8).kaleid(7).kaleid(7)
-    inter: () => osc(.5,.3,.6).diff(shape(2)).mult(osc(1, -0.1))
-    intrad: () => noise(5).color(4,5,7).pixelate(10,10) 
-    perdid: () =>osc(9,-0.1,0.1).modulateKaleid(osc(5,0.5,0),30).scale(0.7,0.3).modulate(noise(5,0.1)).mult(solid(8,6,8.3))
-    relaci: () => shape(999).scrollX([-0.2,0.2].smooth())
-    territ: () => osc(1,1,1).diff(shape()).scale(0.5).add(shape(7),[0,0.25,0.5,0.75,1].fast(10))
-    text: () => osc(50).layer(osc(50).rotate(1).luma())
-    trad: () => voronoi(.5,.2,.9).modulate(noise(.5),0.5).color(9,5,6).luma(0.5)
-    trans: () => osc(1,5,1).saturate( ({time}) => Math.sin(time) * 10 )
-    Verb: () => shape(() => Math.floor(time * 0.3) % 7 + 3, 0.3, 0.01).color(() => Math.sin(time * 0.5) + 0.5,() => Math.cos(time * 0.7) + 0.5,() => Math.sin(time * 0.3) + 0.5).rotate(() => time * 0.1)
+      comun: () => noise(3,0.1).thresh(0.5,0.04).color(() => Math.sin(time*0.5), () => Math.cos(time*0.3), () => Math.sin(time*0.7))
+      cultu: () => osc(20, 0.03, 1.7).rotate(1.58).blend(o0, 0.94).modulateScale(osc(10, 0),-0.03).scale(0.8, () => (1.05 + 0.1 * Math.sin(0.05*time)))
+      contra: () => solid(1,2,5).invert([0,1])
+      dialog: () => osc(12,0.01,0.001).mult(osc(1,0.1).modulate(osc(2).rotate(4,1),20)).color(0,2.4,5).saturate(0.2).luma(1,0.1).scale(0.7, ()=> 0.7 + a.fft[3]).diff(o0)
+      escri: () => voronoi(25,2,10).color(3,3,8).brightness(1.15)
+      expre: () => shape(99).scroll(() => -mouse.x / width,() => -mouse.y / height)
+      global: () => osc(2,1,.009).pixelate(10,10).kaleid(8)
+      habla: () => osc(25,-0.3,0.8).kaleid(7).kaleid(7)
+      inter: () => osc(.5,.3,.6).diff(shape(2)).mult(osc(1, -0.1))
+      intrad: () => noise(5).color(4,5,7).pixelate(10,10) 
+      perdid: () =>osc(9,-0.1,0.1).modulateKaleid(osc(5,0.5,0),30).scale(0.7,0.3).modulate(noise(5,0.1)).mult(solid(8,6,8.3))
+      relaci: () => shape(999).scrollX([-0.2,0.2].smooth())
+      territ: () => osc(1,1,1).diff(shape()).scale(0.5).add(shape(7),[0,0.25,0.5,0.75,1].fast(10))
+      text: () => osc(50).layer(osc(50).rotate(1).luma())
+      trad: () => voronoi(.5,.2,.9).modulate(noise(.5),0.5).color(9,5,6).luma(0.5)
+      trans: () => osc(1,5,1).saturate( ({time}) => Math.sin(time) * 10 )
+      verb: () => shape(() => Math.floor(time * 0.3) % 7 + 3, 0.3, 0.01).color(() => Math.sin(time * 0.5) + 0.5,() => Math.cos(time * 0.7) + 0.5,() => Math.sin(time * 0.3) + 0.5).rotate(() => time * 0.1)
    
     };
 
@@ -134,6 +134,7 @@
   </script>
 </body>
 </html>
+
 
 
 
