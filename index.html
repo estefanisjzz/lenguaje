@@ -99,7 +99,6 @@
       trad: () => voronoi(.5,.2,.9).modulate(noise(.5),0.5).color(9,5,6).luma(0.5)
       trans: () => osc(1,5,1).saturate( ({time}) => Math.sin(time) * 10 )
       verb: () => shape(() => Math.floor(time * 0.3) % 7 + 3, 0.3, 0.01).color(() => Math.sin(time * 0.5) + 0.5,() => Math.cos(time * 0.7) + 0.5,() => Math.sin(time * 0.3) + 0.5).rotate(() => time * 0.1)
-   
     };
 
     const input = document.getElementById("input");
@@ -134,6 +133,7 @@
   </script>
 </body>
 </html>
+
 
 
 
