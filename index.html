@@ -1,151 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>El lenguaje es...</title>
+  <meta charset="utf-8" />
+  <title>Lenguaje — Hydra</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <script src="https://unpkg.com/hydra-synth"></script>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      background: black;
+    html,body { height:100%; margin:0; background:#000; color:#fff; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    #app { display:flex; height:100vh; gap:16px; padding:16px; box-sizing:border-box; }
+    #left { width:360px; max-width:40%; min-width:260px; display:flex; flex-direction:column; gap:12px; }
+    #editor {
+      background:rgba(0,0,0,0.6);
+      border:1px solid rgba(255,255,255,0.08);
+      padding:12px;
+      border-radius:8px;
+      min-height:220px;
+      outline:none;
+      color:#fff;
+      white-space:pre-wrap;
     }
-
-    .container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    .background-text {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      font-size: 6em;
-      color: rgba(255, 255, 255, 0.15);
-      z-index: 1;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Courier New', monospace;
-      font-weight: 300;
-      letter-spacing: 0.1em;
-      line-height: .6;
-    }
-
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 0;
-    }
-
-    #input {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      max-width: 600px;
-      height: 80px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      font-size: 18px;
-      border: 2px solid white;
-      border-radius: 10px;
-      padding: 10px;
-      z-index: 10;
-      backdrop-filter: blur(4px);
-      resize: none;
-    }
+    #editor:empty:before { content: "Escribe palabras aquí..."; color: rgba(255,255,255,0.3); }
+    .controls { display:flex; gap:8px; align-items:center; }
+    button { background:#111; border:1px solid rgba(255,255,255,0.08); color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer;}
+    button:active { transform:translateY(1px); }
+    #wordsList { font-size:13px; color: #ddd; padding:8px; background:rgba(255,255,255,0.03); border-radius:6px; max-height:200px; overflow:auto; }
+    #hydra-canvas { flex:1; border-radius:8px; overflow:hidden; background:#000; }
+    .tag { display:inline-block; padding:2px 8px; margin:4px 6px 4px 0; border-radius:999px; background:rgba(255,255,255,0.04); font-size:13px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="background-text">xx xxxxxxxx xx xx xxxxxxxxxxxx xx xxxxxxxxxxxxx.</div>
+  <div id="app">
+    <div id="left">
+      <h3>Editor de lenguaje</h3>
+      <div id="editor" contenteditable="true" spellcheck="false" aria-label="Editor de palabras"></div>
+
+      <div class="controls">
+        <button id="clearBtn">Borrar todo</button>
+        <button id="exampleBtn">Cargar ejemplo</button>
+      </div>
+
+      <div>
+        <h4>Raíces detectadas</h4>
+        <div id="wordsList">— Ninguna —</div>
+      </div>
+
+      <div>
+        <small>Reglas: escribe palabras (se detecta por prefijo de raíz). Cuando elimines una palabra, su efecto se detiene.</small>
+      </div>
+    </div>
+
+    <div id="hydra-canvas"></div>
   </div>
-  
-  <textarea id="input" placeholder="El lenguaje es..."></textarea>
 
-<script>
-  const hydra = new Hydra({ detectAudio: false });
+  <script>
+    const container = document.getElementById('hydra-canvas');
+    const hydraCanvas = document.createElement('canvas');
 
-  const palabras = {
-    acces: () => osc(20, 0.03, 1.7).kaleid().mult(osc(0, 0.01, 0)).modulateScale(osc(10, 0), -0.03),
-    acuer: () => shape(99).kaleid(4).scale(0.3).scroll(() => -mouse.x / width, () => -mouse.y / height),
-    colect: () => shape(4, 0.9).mult(osc(4, 0.25, 1)).modulateRepeatX(osc(10), 5.0, ({time}) => Math.sin(time) * 5).scale(1, 0.5, 0.05),
-    comun: () => noise(3, 0.1).thresh(0.5, 0.04).color(() => Math.sin(time*0.5), () => Math.cos(time*0.3), () => Math.sin(time*0.7)),
-    cultu: () => osc(20, 0.03, 1.7).rotate(1.58).modulateScale(osc(10, 0), -0.03).scale(0.8, () => (1.05 + 0.1 * Math.sin(0.05*time))),
-    contra: () => solid(1, 2, 5).invert([0,1]),
-    dialog: () => osc(12,0.01,0.001).mult(osc(1,0.1).modulate(osc(2).rotate(4,1),20)).color(0,2.4,5).saturate(0.2).luma(1,0.1).scale(0.7),
-    escri: () => voronoi(25,2,10).color(3,3,8).brightness(1.15),
-    expre: () => shape(99).scroll(() => -mouse.x / width, () => -mouse.y / height),
-    global: () => osc(2,1,.009).pixelate(10,10).kaleid(8),
-    habla: () => osc(25,-0.3,0.8).kaleid(7).kaleid(7),
-    inter: () => osc(.5,.3,.6).diff(shape(2)).mult(osc(1, -0.1)),
-    intrad: () => noise(5).color(4,5,7).pixelate(10,10),
-    perdid: () => osc(9,-0.1,0.1).modulateKaleid(osc(5,0.5,0),30).scale(0.7,0.3).modulate(noise(5,0.1)).mult(solid(8,6,8.3)),
-    relaci: () => shape(999).scrollX([-0.2,0.2].smooth()),
-    territ: () => osc(1,1,1).diff(shape(3)).scale(0.5).add(shape(7),[0,0.25,0.5,0.75,1].fast(10)),
-    text: () => osc(50).layer(osc(50).rotate(1).luma()),
-    trad: () => voronoi(.5,.2,.9).modulate(noise(.5),0.5).color(9,5,6).luma(0.5),
-    trans: () => osc(1,5,1).saturate(({time}) => Math.sin(time) * 10),
-    verb: () => shape(() => Math.floor(time * 0.3) % 7 + 3, 0.3, 0.01)
-              .color(() => Math.sin(time * 0.5) + 0.5,
-                     () => Math.cos(time * 0.7) + 0.5,
-                     () => Math.sin(time * 0.3) + 0.5)
-              .rotate(() => time * 0.1)
-  };
+    const hydra = new Hydra({
+      canvas: hydraCanvas,
+      makeGlobal: true,
+      detectAudio: false
+    });
 
-  const input = document.getElementById("input");
+    container.appendChild(hydraCanvas);
 
-  input.addEventListener("input", () => {
-    const texto = input.value.toLowerCase().trim();
-
-    // 🧹 Limpiar si se borra todo
-    if (texto === "") {
-      solid(0, 0, 0).out();
-      return;
+    function normalize(s) {
+      return s
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9áéíóúüñ_\- ]/gi, '');
     }
 
-    const palabrasActivas = texto.split(/\s+/).map(w => w.trim()).filter(w => palabras[w]);
+    const roots = {
+      acces: () => osc(20, 0.03, 1.7).kaleid().mult(osc(0, 0.01, 0)).blend(o0, 0.9).modulateScale(osc(10, 0), -0.03),
+      acuer: () => osc(4, 0.4, 0.8).color(3, 0.9, 1.1).rotate(0.30, 0.1).pixelate(2, 20).modulate(noise(3.5), () => 1.5 * Math.sin(0.08 * time)),
+      colect: () => shape(4, 0.9).mult(osc(4, 0.25, 1)).modulateRepeatX(osc(10), 5, ({time}) => Math.sin(time)*5).scale(1,0.5,0.05),
+      comun: () => noise(3,0.1).thresh(0.5,0.04).color(()=>Math.sin(time*0.5),()=>Math.cos(time*0.3),()=>Math.sin(time*0.7)),
+      cultu: () => osc(4, 0.4, 0.8).color(3, 0.9, 1.1).rotate(0.30, 0.1).pixelate(2, 20).modulate(noise(3.5), () => 1.5*Math.sin(0.08*time)),
+      contra: () => osc(100,0).kaleid(50).scale(1,8),
+      dialog: () => osc(12,0.01,0.001).mult(osc(1,0.1).modulate(osc(2).rotate(4,1),20)).color(0,2.4,5).saturate(0.2).luma(1,0.1).scale(0.7,()=>0.7+(a.fft?.[3]||0)).diff(o0),
+      escri: () => voronoi(25,2,10).color(3,3,8).brightness(1.15),
+      expres: () => osc(100,-0.0018,0.17)
+                    .diff(osc(20,0.00008).rotate(Math.PI/0.00003))
+                    .modulateScale(noise(1.5,0.18).modulateScale(osc(13).rotate(()=>Math.sin(time/22))),3)
+                    .color(0.11,0.5,0.4)
+                    .contrast(1.4)
+                    .add(src(o0).modulate(o0,.04),.6,.9),
+      global: () => osc(2,1,.009).pixelate(10,10).kaleid(8),
+      habla: () => osc(25,-0.3,0.8).kaleid(7).kaleid(7),
+      inter: () => osc(.5,.3,.6).diff(shape(2)).mult(osc(1,-0.1)),
+      intrad: () => noise(5).color(4,5,7).pixelate(10,10),
+      perdid: () => osc(9,-0.1,0.1).modulateKaleid(osc(5,0.5,0),30).scale(0.7,0.3).modulate(noise(5,0.1)).mult(solid(0.8,0.6,0.83)),
+      relaci: () => shape(999).scrollX([-0.2,0.2].fast()).modulate(noise(1)),
+      territor: () => osc(1,1,1).diff(shape()).scale(0.5).add(shape(7),[0,0.25,0.5,0.75,1].fast(10)),
+      text: () => osc(50).layer(osc(50).rotate(1).luma()),
+      texto: () => osc([2,4,3,4].fast(.2),.5,12).pixelate(40,2,8).color(5,3,.4),
+      trad: () => voronoi(.5,.2,.9).modulate(noise(.5),0.5).color(9,5,6).luma(0.5),
+      trans: () => osc(1,5,1).saturate(({time}) => Math.sin(time)*10),
+      verb: () => shape(()=>Math.floor(time*0.3)%7+3,0.3,0.01)
+                   .color(()=>Math.sin(time*0.5)+0.5,()=>Math.cos(time*0.7)+0.5,()=>Math.sin(time*0.3)+0.5)
+                   .rotate(()=>time*0.1)
+    };
 
-    if (palabrasActivas.length === 0) {
-      return;
+    const rootKeys = Object.keys(roots);
+    let activeRoots = new Set();
+
+    function rebuildHydraOutput() {
+      if (activeRoots.size === 0) {
+        solid(0,0,0).out();
+        return;
+      }
+
+      const arr = Array.from(activeRoots);
+      const weight = 1 / arr.length;
+
+      let node = solid(0,0,0);
+
+      arr.forEach(r => {
+        node = node.blend(roots[r](), weight);
+      });
+
+      node.out();
     }
 
-    // 🌀 Crear la primera capa en o1
-    let base = palabras[palabrasActivas[0]]().out(o1);
-
-    // 🧩 Ir combinando las demás sin borrar la anterior
-    for (let i = 1; i < palabrasActivas.length; i++) {
-      palabras[palabrasActivas[i]]()
-        .blend(src(o1), 0.5)   // mezcla visual
-        .out(o1);
+    function detectRootFromWord(word) {
+      const w = normalize(word);
+      const sorted = rootKeys.slice().sort((a,b)=>b.length-a.length);
+      for (const k of sorted) if (w.startsWith(k)) return k;
+      return null;
     }
 
-    // 🎨 Finalmente mostrar o1 en pantalla
-    src(o1).blend(o0, 0.6).out(o0);
-  });
-</script>
+    function analyzeTextAndUpdate(raw) {
+      const text = String(raw||"").replace(/\s+/g," ").trim();
+      const tokens = text.length ? text.split(/\s+/) : [];
+      const detected = new Set();
 
+      tokens.forEach(t=>{
+        const root = detectRootFromWord(t);
+        if (root) detected.add(root);
+      });
+
+      activeRoots = detected;
+
+      const list = document.getElementById("wordsList");
+      list.innerHTML =
+        activeRoots.size === 0
+        ? "— Ninguna —"
+        : Array.from(activeRoots).map(r=>`<span class="tag">${r}</span>`).join("");
+
+      rebuildHydraOutput();
+    }
+
+    const editor = document.getElementById("editor");
+    editor.addEventListener("input", ()=>{
+      const text = editor.innerText;
+      editor.innerText = text;
+      analyzeTextAndUpdate(text);
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", ()=>{
+      editor.innerText = "";
+      analyzeTextAndUpdate("");
+    });
+
+    document.getElementById("exampleBtn").addEventListener("click", ()=>{
+      const example =
+        "accesibilidad acuerdo colectivo comunicacion cultura contraria dialogo escrito expresion global habla interfaz intraducibilidad perdida relacion territorio textil texto traduccion transformacion verbo";
+      editor.innerText = example;
+      analyzeTextAndUpdate(example);
+    });
+
+    analyzeTextAndUpdate("");
+
+    function resizeCanvas() {
+      hydraCanvas.width = container.clientWidth;
+      hydraCanvas.height = container.clientHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
