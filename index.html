@@ -82,92 +82,66 @@
 const hydra = new Hydra({ detectAudio: false });
 
 const palabras = {
-
-  lenguaje: () => {
-    hush();
-    return solid(0,0,0);
-
+  lenguaje: () => hush(),
 
   acces: () => osc(20, 0.03, 1.7).kaleid().mult(osc(0, 0.01, 0)).blend(o0, 0.9).modulateScale(osc(10, 0), -0.03),
+
   acuer: () => osc(4, 0.4, 0.8).color(3, 1, 1.1).rotate(0.3, 0.1).pixelate(2, 20).modulate(noise(3.5), () => 1.5 * Math.sin(0.08 * time)),
+
   colect: () => shape(4, 0.9).mult(osc(4, 0.25, 1)).modulateRepeatX(osc(10), 5.0, ({ time }) => Math.sin(time) * 5).scale(1, 0.5, 0.05),
-  comun: () => noise(3, 0.1).thresh(0.5, 0.04).color(() => Math.sin(time * 0.5),() => Math.cos(time * 0.3),() => Math.sin(time * 0.7))
-  cultu: () =>
-    osc(4, 0.4, 0.8)
-      .color(3, 1, 1.1)
-      .rotate(0.3, 0.1)
-      .pixelate(2, 20)
-      .modulate(noise(3.5), () => 1.5 * Math.sin(0.08 * time)),
 
-  contra: () =>
-    osc(100, 0).kaleid(50).scale(1, 8),
+  comun: () => noise(3, 0.1).thresh(0.5, 0.04).color(() => Math.sin(time * 0.5), () => Math.cos(time * 0.3), () => Math.sin(time * 0.7)),
 
-  dialog: () =>
-    osc(12, 0.01, 0.001)
-      .mult(osc(1, 0.1).modulate(osc(2).rotate(4, 1), 20))
-      .color(0, 2.4, 5)
-      .saturate(0.2)
-      .luma(1, 0.1)
-      .scale(0.7, () => 0.7 + a.fft[3])
-      .diff(o0),
+  cultu: () => osc(4, 0.4, 0.8).color(3, 1, 1.1).rotate(0.3, 0.1).pixelate(2, 20).modulate(noise(3.5), () => 1.5 * Math.sin(0.08 * time)),
 
-  escri: () =>
-    voronoi(25, 2, 10).color(3, 3, 8).brightness(1.15),
+  contra: () => osc(100, 0).kaleid(50).scale(1, 8),
 
-  expre: () =>
-    shape(99).scroll(
-      () => -mouse.x / width,
-      () => -mouse.y / height
-    ),
+  dialog: () => osc(12, 0.01, 0.001)
+                  .mult(osc(1, 0.1).modulate(osc(2).rotate(4, 1), 20))
+                  .color(0, 2.4, 5)
+                  .saturate(0.2)
+                  .luma(1, 0.1)
+                  .scale(0.7)
+                  .diff(o0),
 
-  global: () =>
-    osc(2, 1, 0.009).pixelate(10, 10).kaleid(8),
+  escri: () => voronoi(25, 2, 10).color(3, 3, 8).brightness(1.15),
 
-  habla: () =>
-    osc(25, -0.3, 0.8).kaleid(7).kaleid(7),
+  expre: () => voronoi(8,1)
+                .mult(osc(10,0.1,()=>Math.sin(time)*3).saturate(3).kaleid(200))
+                .modulate(o0,0.5)
+                .add(o0,0.8)
+                .scrollY(-0.01)
+                .scale(0.99)
+                .modulate(voronoi(8,1),0.008)
+                .luma(0.3),
 
-  inter: () =>
-    osc(0.5, 0.3, 0.6).diff(shape(2)).mult(osc(1, -0.1)),
+  global: () => osc(2, 1, 0.009).pixelate(10, 10).kaleid(8),
 
-  intrad: () =>
-    noise(5).color(4, 5, 7).pixelate(10, 10),
+  habla: () => osc(25, -0.3, 0.8).kaleid(7).kaleid(7),
 
-  perdid: () =>
-    osc(9, -0.1, 0.1)
-      .modulateKaleid(osc(5, 0.5, 0), 30)
-      .scale(0.7, 0.3)
-      .modulate(noise(5, 0.1))
-      .mult(solid(8, 6, 8.3)),
+  inter: () => osc(0.5, 0.3, 0.6).diff(shape(2)).mult(osc(1, -0.1)),
 
-  relaci: () =>
-    shape(999).scrollX([-0.2, 0.2].smooth()),
+  intrad: () => noise(5).color(4, 5, 7).pixelate(10, 10),
 
-  territ: () =>
-    osc(1, 1, 1)
-      .diff(shape(3))
-      .scale(0.5)
-      .add(shape(7), [0, 0.25, 0.5, 0.75, 1].fast(10)),
+  perdid: () => osc(9, -0.1, 0.1).modulateKaleid(osc(5, 0.5, 0), 30).scale(0.7, 0.3).modulate(noise(5, 0.1)).mult(solid(8, 6, 8.3)),
 
-  text: () =>
-    osc(50).layer(osc(50).rotate(1).luma()),
+  relaci: () => shape(999).scrollX([-0.2, 0.2].smooth()),
 
-  trad: () =>
-    voronoi(0.5, 0.2, 0.9)
-      .modulate(noise(0.5), 0.5)
-      .color(9, 5, 6)
-      .luma(0.5),
+  territ: () => osc(1, 1, 1).diff(shape(3)).scale(0.5).add(shape(7), [0, 0.25, 0.5, 0.75, 1].fast(10)),
 
-  trans: () =>
-    osc(1, 5, 1).saturate(({ time }) => Math.sin(time) * 10),
+  text: () => osc(50).layer(osc(50).rotate(1).luma()),
 
-  verb: () =>
-    shape(() => Math.floor(time * 0.3) % 7 + 3, 0.3, 0.01)
-      .color(
-        () => Math.sin(time * 0.5) + 0.5,
-        () => Math.cos(time * 0.7) + 0.5,
-        () => Math.sin(time * 0.3) + 0.5
-      )
-      .rotate(() => time * 0.1)
+  trad: () => voronoi(0.5, 0.2, 0.9).modulate(noise(0.5), 0.5).color(9, 5, 6).luma(0.5),
+
+  trans: () => osc(1, 5, 1).saturate(({ time }) => Math.sin(time) * 10),
+
+  verb: () => shape(() => Math.floor(time * 0.3) % 7 + 3, 0.3, 0.01)
+                .color(
+                  () => Math.sin(time * 0.5) + 0.5,
+                  () => Math.cos(time * 0.7) + 0.5,
+                  () => Math.sin(time * 0.3) + 0.5
+                )
+                .rotate(() => time * 0.1)
 };
 
 const input = document.getElementById("input");
@@ -190,16 +164,11 @@ input.addEventListener("input", () => {
 
   if (palabrasActivas.length === 0) return;
 
-
-  // 1) Base
   let base = palabras[palabrasActivas[0]]();
   base.out(o1);
 
-  // 2) Capas acumulativas
   for (let i = 1; i < palabrasActivas.length; i++) {
-
     let capa = palabras[palabrasActivas[i]]();
-
     let mezcla = 0.25 + 0.25 * Math.sin(time * 0.5);
 
     capa
@@ -208,7 +177,6 @@ input.addEventListener("input", () => {
       .out(o1);
   }
 
-  // 3) Salida final
   src(o1).out(o0);
 });
 </script>
