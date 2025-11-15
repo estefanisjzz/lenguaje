@@ -86,37 +86,12 @@ const palabras = {
   lenguaje: () => {
     hush();
     return solid(0,0,0);
-  },
 
-  acces: () =>
-    osc(20, 0.03, 1.7)
-      .kaleid()
-      .mult(osc(0, 0.01, 0))
-      .blend(o0, 0.9)
-      .modulateScale(osc(10, 0), -0.03),
 
-  acuer: () =>
-    osc(4, 0.4, 0.8)
-      .color(3, 1, 1.1)
-      .rotate(0.3, 0.1)
-      .pixelate(2, 20)
-      .modulate(noise(3.5), () => 1.5 * Math.sin(0.08 * time)),
-
-  colect: () =>
-    shape(4, 0.9)
-      .mult(osc(4, 0.25, 1))
-      .modulateRepeatX(osc(10), 5.0, ({ time }) => Math.sin(time) * 5)
-      .scale(1, 0.5, 0.05),
-
-  comun: () =>
-    noise(3, 0.1)
-      .thresh(0.5, 0.04)
-      .color(
-        () => Math.sin(time * 0.5),
-        () => Math.cos(time * 0.3),
-        () => Math.sin(time * 0.7)
-      ),
-
+  acces: () => osc(20, 0.03, 1.7).kaleid().mult(osc(0, 0.01, 0)).blend(o0, 0.9).modulateScale(osc(10, 0), -0.03),
+  acuer: () => osc(4, 0.4, 0.8).color(3, 1, 1.1).rotate(0.3, 0.1).pixelate(2, 20).modulate(noise(3.5), () => 1.5 * Math.sin(0.08 * time)),
+  colect: () => shape(4, 0.9).mult(osc(4, 0.25, 1)).modulateRepeatX(osc(10), 5.0, ({ time }) => Math.sin(time) * 5).scale(1, 0.5, 0.05),
+  comun: () => noise(3, 0.1).thresh(0.5, 0.04).color(() => Math.sin(time * 0.5),() => Math.cos(time * 0.3),() => Math.sin(time * 0.7))
   cultu: () =>
     osc(4, 0.4, 0.8)
       .color(3, 1, 1.1)
@@ -188,7 +163,59 @@ const palabras = {
   verb: () =>
     shape(() => Math.floor(time * 0.3) % 7 + 3, 0.3, 0.01)
       .color(
-        () => Math.sin(tim
+        () => Math.sin(time * 0.5) + 0.5,
+        () => Math.cos(time * 0.7) + 0.5,
+        () => Math.sin(time * 0.3) + 0.5
+      )
+      .rotate(() => time * 0.1)
+};
+
+const input = document.getElementById("input");
+
+
+input.addEventListener("input", () => {
+
+  const texto = input.value.toLowerCase().trim();
+
+  if (texto === "") {
+    hush();
+    solid(0,0,0).out();
+    return;
+  }
+
+  const palabrasActivas = texto
+    .split(/\s+/)
+    .map(w => w.trim())
+    .filter(w => palabras[w]);
+
+  if (palabrasActivas.length === 0) return;
+
+
+  // 1) Base
+  let base = palabras[palabrasActivas[0]]();
+  base.out(o1);
+
+  // 2) Capas acumulativas
+  for (let i = 1; i < palabrasActivas.length; i++) {
+
+    let capa = palabras[palabrasActivas[i]]();
+
+    let mezcla = 0.25 + 0.25 * Math.sin(time * 0.5);
+
+    capa
+      .blend(src(o1), mezcla)
+      .layer(src(o1))
+      .out(o1);
+  }
+
+  // 3) Salida final
+  src(o1).out(o0);
+});
+</script>
+
+</body>
+</html>
+
 
 
 
