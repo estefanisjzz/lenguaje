@@ -82,7 +82,7 @@
     const hydra = new Hydra({ detectAudio: false });
 
     const palabras = { 
-      lenguaje: () => hush(); 
+      lenguaje: () => hush(), 
       acces: () => osc(20, 0.03, 1.7).kaleid().mult(osc(0, 0.01, 0)).blend(o0, 0.9).modulateScale(osc(10, 0), -0.03),
       acuer: () => osc(4, 0.4, 0.8).color(3, 1, 1.1).rotate(0.3, 0.1).pixelate(2, 20).modulate(noise(3.5), () => 1.5 * Math.sin(0.08 * time)),
       colect: () => shape(4, 0.9).mult(osc(4, 0.25, 1)).modulateRepeatX(osc(10), 5.0, ({ time }) => Math.sin(time) * 5).scale(1, 0.5, 0.05),
@@ -108,24 +108,24 @@
 
     const input = document.getElementById("input");
 
-    input.addEventListener("input", () => {
-      const texto = input.value.toLowerCase().trim()
+   input.addEventListener("input", () => {
+  const texto = input.value.toLowerCase().trim();
+  
+  // Si no hay coma, renderiza todo en capas independientes
+  const entradas = texto.split(/\s+/).map(w => w.trim()).filter(w => palabras[w]);
+  if (entradas.length > 0) {
+    // Componer blend entre todas
+    let comp = palabras[entradas[0]]();
+    for (let i = 1; i < entradas.length; i++) {
+      comp = comp.diff(palabras[entradas[i]](), 0.5);
     }
-
-      // Si no hay coma, renderiza todo en capas independientes
-      const entradas = texto.split(/\s+/).map(w => w.trim()).filter(w => palabras[w]);
-      if (entradas.length > 0) {
-        // Componer blend entre todas
-        let comp = palabras[entradas[0]]();
-        for (let i = 1; i < entradas.length; i++) {
-          comp = comp.diff(palabras[entradas[i]](), 0.5);
-        }
-        comp.out();
-      }
-    });
+    comp.out();
+  }
+});
   </script>
 </body>
 </html>
+
 
 
 
